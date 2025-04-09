@@ -53,14 +53,14 @@ export function AuthProvider({ children }) {
 
   const login = async (name, password) => {
     const user = { name, password }
-    console.log("login")
+    // console.log("login")
     const response = await axios.post(
       "http://localhost:7001/api/auth/login",
       user,
       { withCredentials: true }
     )
 
-    console.log("response:", response.data)
+    // console.log("response:", response.data)
 
     // await new Promise((resolve) => setTimeout(resolve, 1000))
 
@@ -88,14 +88,14 @@ export function AuthProvider({ children }) {
 
   const signup = async (name, email, password) => {
     const user = { name, email, password }
-    console.log("singup")
+    // console.log("singup")
     const response = await axios.post(
       "http://localhost:7001/api/auth/register",
       user,
       { withCredentials: true }
     )
 
-    console.log("response:", response.data)
+    // console.log("response:", response.data)
 
     // await new Promise((resolve) => setTimeout(resolve, 1000))
 
@@ -122,14 +122,14 @@ export function AuthProvider({ children }) {
   }
 
   const verifyEmail = async (code) => {
-    console.log("verifyEmail")
+    // console.log("verifyEmail")
     const response = await axios.post(
       "http://localhost:7001/api/auth/verifyEmail",
       { code },
       { withCredentials: true }
     )
 
-    console.log("response:", response.data)
+    // console.log("response:", response.data)
 
     // await new Promise((resolve) => setTimeout(resolve, 1000))
 
@@ -160,14 +160,14 @@ export function AuthProvider({ children }) {
   }
 
   const setupMfa = async () => {
-    console.log("setupMfa", JSON.parse(localStorage.getItem("user")))
+    // console.log("setupMfa", JSON.parse(localStorage.getItem("user")))
     const response = await axios.post(
       "http://localhost:7001/api/auth/2fa/setup",
       JSON.parse(localStorage.getItem("user")),
       { withCredentials: true }
     )
 
-    console.log("response:", response)
+    // console.log("response:", response)
 
     // await new Promise((resolve) => setTimeout(resolve, 1000))
 
