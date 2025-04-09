@@ -79,6 +79,10 @@ function MfaSetup() {
             {isLoading ? "Verifying..." : "Verify and Enable"}
           </button>
         </form>
+
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray">After authenticating up MFA, you'll be able to access your account securely.</p>
+        </div>
       </div>
     </div>
   )

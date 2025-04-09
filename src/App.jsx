@@ -12,14 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/auth-flow"
-            element={
-              <ProtectedRoute>
-                <AuthFlow />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/auth-flow" element={<AuthFlow />} />
           <Route
             path="/home"
             element={

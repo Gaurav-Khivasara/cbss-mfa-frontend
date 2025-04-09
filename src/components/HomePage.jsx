@@ -44,7 +44,7 @@ function HomePage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>Email: {user?.email}</span>
+                <span>User: {user?.name}</span>
               </div>
             </div>
           </div>

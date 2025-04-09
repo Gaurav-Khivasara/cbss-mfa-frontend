@@ -9,17 +9,36 @@ import MfaVerification from "./MfaVerification"
 
 function AuthFlow() {
   const navigate = useNavigate()
-  const { isLoading, isAuthenticated, needsEmailVerification, needsMfaSetup, needsMfaVerification } = useAuth()
+  const {
+    isLoading,
+    isAuthenticated,
+    isRegistered,
+    needsEmailVerification,
+    needsLogin,
+    needsMfaSetup,
+    needsMfaVerification,
+  } = useAuth()
 
   useEffect(() => {
     if (!isLoading) {
-      if (!isAuthenticated) {
-        navigate("/login")
-      } else if (!needsEmailVerification && !needsMfaSetup && !needsMfaVerification) {
+      if (isAuthenticated) {
+        // If fully authenticated, go to home
         navigate("/home")
+      } else if (needsLogin || (!isRegistered && !needsEmailVerification)) {
+        // If needs login or not registered, go to login page
+        navigate("/login")
       }
     }
-  }, [isLoading, isAuthenticated, needsEmailVerification, needsMfaSetup, needsMfaVerification, navigate])
+  }, [
+    isLoading,
+    isAuthenticated,
+    isRegistered,
+    needsEmailVerification,
+    needsLogin,
+    needsMfaSetup,
+    needsMfaVerification,
+    navigate,
+  ])
 
   if (isLoading) {
     return (

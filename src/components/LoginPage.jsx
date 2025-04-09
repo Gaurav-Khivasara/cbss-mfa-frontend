@@ -59,7 +59,7 @@ function LoginPage() {
       // console.log("email:", formData.email)
       // console.log("password:", formData.password)
       await signup(formData.name, formData.email, formData.password)
-      // navigate("/auth-flow")
+      navigate("/auth-flow")
     } catch (err) {
       setError("Failed to create account")
     } finally {

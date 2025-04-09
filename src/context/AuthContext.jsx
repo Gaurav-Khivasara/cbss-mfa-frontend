@@ -9,7 +9,9 @@ export function AuthProvider({ children }) {
     user: null,
     isLoading: true,
     isAuthenticated: false,
+    isRegistered: false,
     needsEmailVerification: false,
+    needsLogin: false,
     needsMfaSetup: false,
     needsMfaVerification: false,
   })
@@ -18,20 +20,27 @@ export function AuthProvider({ children }) {
     // Check if user is already logged in
     const checkAuth = async () => {
       try {
-        // In a real app, you would check session/token validity here
         const storedUser = localStorage.getItem("user")
+        const isRegistered = localStorage.getItem("isRegistered") === "true"
+
         if (storedUser) {
           const user = JSON.parse(storedUser)
           setAuthState({
             user,
             isLoading: false,
-            isAuthenticated: true,
-            needsEmailVerification: !user.emailVerified,
-            needsMfaSetup: user.emailVerified && !user.mfaEnabled,
-            needsMfaVerification: user.emailVerified && user.mfaEnabled,
+            isAuthenticated: user.mfaEnabled, // Only fully authenticated if MFA is verified
+            isRegistered: true,
+            needsEmailVerification: false,
+            needsLogin: false,
+            needsMfaSetup: false,
+            needsMfaVerification: !user.mfaEnabled,
           })
         } else {
-          setAuthState((prev) => ({ ...prev, isLoading: false }))
+          setAuthState((prev) => ({
+            ...prev,
+            isLoading: false,
+            isRegistered,
+          }))
         }
       } catch (error) {
         console.error("Auth check failed:", error)
@@ -43,21 +52,18 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = async (name, password) => {
-    // HERE !! {
-    const user = {name, password}
+    const user = { name, password }
     console.log("login")
     const response = await axios.post(
       "http://localhost:7001/api/auth/login",
       user,
-      {withCredentials: true}
+      { withCredentials: true }
     )
-    
+
     console.log("response:", response.data)
-    
-    // Simulate API call
+
     // await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Mock user - in a real app, this would come from your backend
     // const user = {
     //   id: "1",
     //   name: "Test User",
@@ -71,29 +77,28 @@ export function AuthProvider({ children }) {
     setAuthState({
       user,
       isLoading: false,
-      isAuthenticated: true,
-      needsEmailVerification: !user.emailVerified,
-      needsMfaSetup: user.emailVerified && !user.mfaEnabled,
-      needsMfaVerification: user.emailVerified && user.mfaEnabled,
+      isAuthenticated: false,
+      isRegistered: true,
+      needsEmailVerification: false,
+      needsLogin: false,
+      needsMfaSetup: true, // After login, user needs to set up MFA
+      needsMfaVerification: false,
     })
   }
 
   const signup = async (name, email, password) => {
-    // HERE !!
-    const user = {name, email, password}
+    const user = { name, email, password }
     console.log("singup")
     const response = await axios.post(
       "http://localhost:7001/api/auth/register",
       user,
-      {withCredentials: true}
+      { withCredentials: true }
     )
-  
+
     console.log("response:", response.data)
 
-    // Simulate API call
     // await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Mock user - in a real app, this would come from your backend
     // const user = {
     //   id: "1",
     //   name,
@@ -107,18 +112,25 @@ export function AuthProvider({ children }) {
     setAuthState({
       user,
       isLoading: false,
-      isAuthenticated: true,
+      isAuthenticated: false,
+      isRegistered: false,
       needsEmailVerification: true,
+      needsLogin: false,
       needsMfaSetup: false,
       needsMfaVerification: false,
     })
   }
 
   const verifyEmail = async (code) => {
-    // HERE !!
-    
+    console.log("verifyEmail")
+    const response = await axios.post(
+      "http://localhost:7001/api/auth/verifyEmail",
+      { code },
+      { withCredentials: true }
+    )
 
-    // Simulate API call
+    console.log("response:", response.data)
+
     // await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Update user
@@ -129,35 +141,48 @@ export function AuthProvider({ children }) {
       }
 
       localStorage.setItem("user", JSON.stringify(updatedUser))
+      localStorage.setItem("isRegistered", "true")
+
+      // After email verification, user needs to log in
+      localStorage.removeItem("user")
 
       setAuthState({
-        user: updatedUser,
+        user: null,
         isLoading: false,
-        isAuthenticated: true,
+        isAuthenticated: false,
+        isRegistered: true,
         needsEmailVerification: false,
-        needsMfaSetup: true,
+        needsLogin: true,
+        needsMfaSetup: false,
         needsMfaVerification: false,
       })
     }
   }
 
   const setupMfa = async () => {
-    // HERE !!
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    console.log("setupMfa", JSON.parse(localStorage.getItem("user")))
+    const response = await axios.post(
+      "http://localhost:7001/api/auth/2fa/setup",
+      JSON.parse(localStorage.getItem("user")),
+      { withCredentials: true }
+    )
 
-    // In a real app, this would come from your backend
-    // The backend would generate a secret and QR code for the user
+    console.log("response:", response)
+
+    // await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // return {
+    //   qrCode:
+    //     "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMyAyMyI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTEgMWgyMXYyMUgxeiIvPjxwYXRoIGZpbGw9IiNmZmZmZmYiIGQ9Ik0yIDJoMTl2MTlIMnoiLz48cGF0aCBkPSJNMyAzaDN2M0gzem0xMCAwaDN2M2gtM3ptLTEwIDEwaDN2M0gzem0yLTJoMXYxSDV6bTIgMGgxdjFIN3ptMiAwaDF2MUg5em0yIDBoMXYxaC0xem0yIDBoMXYxaC0xem0yIDBoMXYxaC0xem0yIDBoMXYxaC0xem0tMTAgMmgxdjFINXptMiAwaDF2MUg3em0yIDBoMXYxSDl6bTIgMGgxdjFoLTF6bTIgMGgxdjFoLTF6bTIgMGgxdjFoLTF6bTIgMGgxdjFoLTF6bS0xMCAyaDN2M2gtM3ptMTAgMGgzdjNoLTN6Ii8+PC9zdmc+",
+    //   secret: "ABCDEFGHIJKLMNOP",
+    // }
     return {
-      qrCode:
-        "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMyAyMyI+PHBhdGggZmlsbD0iIzAwMDAwMCIgZD0iTTEgMWgyMXYyMUgxeiIvPjxwYXRoIGZpbGw9IiNmZmZmZmYiIGQ9Ik0yIDJoMTl2MTlIMnoiLz48cGF0aCBkPSJNMyAzaDN2M0gzem0xMCAwaDN2M2gtM3ptLTEwIDEwaDN2M0gzem0yLTJoMXYxSDV6bTIgMGgxdjFIN3ptMiAwaDF2MUg5em0yIDBoMXYxaC0xem0yIDBoMXYxaC0xem0yIDBoMXYxaC0xem0yIDBoMXYxaC0xem0tMTAgMmgxdjFINXptMiAwaDF2MUg3em0yIDBoMXYxSDl6bTIgMGgxdjFoLTF6bTIgMGgxdjFoLTF6bTIgMGgxdjFoLTF6bTIgMGgxdjFoLTF6bS0xMCAyaDN2M2gtM3ptMTAgMGgzdjNoLTN6Ii8+PC9zdmc+",
-      secret: "ABCDEFGHIJKLMNOP",
+      qrCode: response.data.qrCode,
+      secret: response.data.secret
     }
   }
 
   const verifyMfa = async (code) => {
-    // HERE !!
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Update user
@@ -173,7 +198,9 @@ export function AuthProvider({ children }) {
         user: updatedUser,
         isLoading: false,
         isAuthenticated: true,
+        isRegistered: true,
         needsEmailVerification: false,
+        needsLogin: false,
         needsMfaSetup: false,
         needsMfaVerification: false,
       })
@@ -186,7 +213,9 @@ export function AuthProvider({ children }) {
       user: null,
       isLoading: false,
       isAuthenticated: false,
+      isRegistered: localStorage.getItem("isRegistered") === "true",
       needsEmailVerification: false,
+      needsLogin: false,
       needsMfaSetup: false,
       needsMfaVerification: false,
     })

@@ -48,6 +48,10 @@ function EmailVerification() {
             {isLoading ? "Verifying..." : "Verify Email"}
           </button>
         </form>
+
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray">After verification, you'll need to log in to your account.</p>
+        </div>
       </div>
 
       <div className="card-footer text-center">
