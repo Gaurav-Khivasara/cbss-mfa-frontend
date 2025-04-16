@@ -56,6 +56,7 @@ export function AuthProvider({ children }) {
     // console.log("login")
     const response = await axios.post(
       "http://localhost:7001/api/auth/login",
+      // "https://cbss-mfa-backend-dvb0cagub6e2eqc8.westus-01.azurewebsites.net:7001/api/auth/login",
       user,
       { withCredentials: true }
     )
@@ -91,6 +92,7 @@ export function AuthProvider({ children }) {
     // console.log("singup")
     const response = await axios.post(
       "http://localhost:7001/api/auth/register",
+      // "https://cbss-mfa-backend-dvb0cagub6e2eqc8.westus-01.azurewebsites.net:7001/api/auth/register",
       user,
       { withCredentials: true }
     )
@@ -125,6 +127,7 @@ export function AuthProvider({ children }) {
     // console.log("verifyEmail")
     const response = await axios.post(
       "http://localhost:7001/api/auth/verifyEmail",
+      // "https://cbss-mfa-backend-dvb0cagub6e2eqc8.westus-01.azurewebsites.net:7001/api/auth/verifyEmail",
       { code },
       { withCredentials: true }
     )
@@ -163,6 +166,7 @@ export function AuthProvider({ children }) {
     // console.log("setupMfa", JSON.parse(localStorage.getItem("user")))
     const response = await axios.post(
       "http://localhost:7001/api/auth/2fa/setup",
+      // "https://cbss-mfa-backend-dvb0cagub6e2eqc8.westus-01.azurewebsites.net:7001/api/auth/2fa/setup",
       JSON.parse(localStorage.getItem("user")),
       { withCredentials: true }
     )
@@ -183,7 +187,16 @@ export function AuthProvider({ children }) {
   }
 
   const verifyMfa = async (code) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    const response = await axios.post(
+      "http://localhost:7001/api/auth/2fa/verify",
+      // "https://cbss-mfa-backend-dvb0cagub6e2eqc8.westus-01.azurewebsites.net:7001/api/auth/2fa/verify",
+      { "token": code },
+      { withCredentials: true }
+    )
+
+    // console.log("res: " + response)
+
+    // await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Update user
     if (authState.user) {
