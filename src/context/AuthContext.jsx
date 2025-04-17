@@ -55,8 +55,7 @@ export function AuthProvider({ children }) {
     const user = { name, password }
     // console.log("login")
     const response = await axios.post(
-      "http://localhost:7001/api/auth/login",
-      // "https://cbss-mfa-backend-dvb0cagub6e2eqc8.westus-01.azurewebsites.net:7001/api/auth/login",
+      import.meta.env.VITE_API_URL + ":" + import.meta.env.VITE_PORT + "/api/auth/login",
       user,
       { withCredentials: true }
     )
@@ -91,8 +90,7 @@ export function AuthProvider({ children }) {
     const user = { name, email, password }
     // console.log("singup")
     const response = await axios.post(
-      "http://localhost:7001/api/auth/register",
-      // "https://cbss-mfa-backend-dvb0cagub6e2eqc8.westus-01.azurewebsites.net:7001/api/auth/register",
+      import.meta.env.VITE_API_URL + ":" + import.meta.env.VITE_PORT + "/api/auth/register",
       user,
       { withCredentials: true }
     )
@@ -126,8 +124,7 @@ export function AuthProvider({ children }) {
   const verifyEmail = async (code) => {
     // console.log("verifyEmail")
     const response = await axios.post(
-      "http://localhost:7001/api/auth/verifyEmail",
-      // "https://cbss-mfa-backend-dvb0cagub6e2eqc8.westus-01.azurewebsites.net:7001/api/auth/verifyEmail",
+      import.meta.env.VITE_API_URL + ":" + import.meta.env.VITE_PORT + "/api/auth/verifyEmail",
       { code },
       { withCredentials: true }
     )
@@ -165,8 +162,7 @@ export function AuthProvider({ children }) {
   const setupMfa = async () => {
     // console.log("setupMfa", JSON.parse(localStorage.getItem("user")))
     const response = await axios.post(
-      "http://localhost:7001/api/auth/2fa/setup",
-      // "https://cbss-mfa-backend-dvb0cagub6e2eqc8.westus-01.azurewebsites.net:7001/api/auth/2fa/setup",
+      import.meta.env.VITE_API_URL + ":" + import.meta.env.VITE_PORT + "/api/auth/2fa/setup",
       JSON.parse(localStorage.getItem("user")),
       { withCredentials: true }
     )
@@ -188,8 +184,7 @@ export function AuthProvider({ children }) {
 
   const verifyMfa = async (code) => {
     const response = await axios.post(
-      "http://localhost:7001/api/auth/2fa/verify",
-      // "https://cbss-mfa-backend-dvb0cagub6e2eqc8.westus-01.azurewebsites.net:7001/api/auth/2fa/verify",
+      import.meta.env.VITE_API_URL + ":" + import.meta.env.VITE_PORT + "/api/auth/2fa/verify",
       { "token": code },
       { withCredentials: true }
     )
